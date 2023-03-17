@@ -174,7 +174,48 @@ function weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,keyLevel){
     }
 }
 
-// console.log(apiData);
+function generateNextKeyGains() {
+    for (let i=0; i<fortRunsExtracted.length; i++) {
+        let tyrCurrentBase = tyrRunsExtracted[i].score;
+        let fortCurrentBase = fortRunsExtracted[i].score;
+        let affix = "Fortified";
+        let level = fortRunsExtracted[i].keyLevel + 1;
+        let weightedGain = weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,level);
+        fortRunsExtracted[i].nextKeyGain = weightedGain;
+    }
+        for (let i=0; i<tyrRunsExtracted.length; i++) {
+        let tyrCurrentBase = tyrRunsExtracted[i].score;
+        let fortCurrentBase = fortRunsExtracted[i].score;
+        let affix = "Tyrannical";
+        let level = tyrRunsExtracted[i].keyLevel + 1;
+        let weightedGain = weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,level);
+        tyrRunsExtracted[i].nextKeyGain = weightedGain;
+    }
+}
+
+generateNextKeyGains();
+
+function generateUserKeyGains() {
+    for (let i=0; i<fortRunsExtracted.length; i++) {
+        let tyrCurrentBase = tyrRunsExtracted[i].score;
+        let fortCurrentBase = fortRunsExtracted[i].score;
+        let affix = "Fortified";
+        let level = userKeyLevel;
+        let weightedGain = weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,level);
+        fortRunsExtracted[i].userKeyGain = weightedGain;
+    }
+        for (let i=0; i<tyrRunsExtracted.length; i++) {
+        let tyrCurrentBase = tyrRunsExtracted[i].score;
+        let fortCurrentBase = fortRunsExtracted[i].score;
+        let affix = "Tyrannical";
+        let level = userKeyLevel;
+        let weightedGain = weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,level);
+        tyrRunsExtracted[i].userKeyGain = weightedGain;
+    }
+}
+
+generateUserKeyGains();
+
 ---
 
 <table>
@@ -183,8 +224,8 @@ function weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,keyLevel){
       <th rowspan="2">Dungeon</th>
       <th colspan="2">Current Fortified Score</th>
       <th colspan="2">Current Tyrannical Score</th>
-      <th colspan="2">Gain timing next key</th>
-      <th colspan="2">Gain timing user key level</th>
+      <th colspan="2">Gain next key</th>
+      <th colspan="2">Gain user key level({userKeyLevel})</th>
     </tr>
     <tr>
       <th>Key Level</th>
@@ -204,10 +245,10 @@ function weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,keyLevel){
       <td>{fortRunsExtracted[0].weightedScore.toFixed(1)}</td>
       <td>{tyrRunsExtracted[0].keyLevel}</td>
       <td>{tyrRunsExtracted[0].weightedScore.toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[0].score,fortRunsExtracted[0].score,"Fortified",(fortRunsExtracted[0].keyLevel +1)).toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[0].score,fortRunsExtracted[0].score,"Tyrannical",(tyrRunsExtracted[0].keyLevel +1)).toFixed(1)}</td>
-      <td></td>
-      <td></td>
+      <td>{fortRunsExtracted[0].nextKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[0].nextKeyGain.toFixed(1)}</td>
+      <td>{fortRunsExtracted[0].userKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[0].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
       <td>{dungeons.d1}</td>
@@ -215,10 +256,10 @@ function weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,keyLevel){
       <td>{fortRunsExtracted[1].weightedScore.toFixed(1)}</td>
       <td>{tyrRunsExtracted[1].keyLevel}</td>
       <td>{tyrRunsExtracted[1].weightedScore.toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[1].score,fortRunsExtracted[1].score,"Fortified",(fortRunsExtracted[1].keyLevel +1)).toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[1].score,fortRunsExtracted[1].score,"Tyrannical",(tyrRunsExtracted[1].keyLevel +1)).toFixed(1)}</td>
-      <td></td>
-      <td></td>
+      <td>{fortRunsExtracted[1].nextKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[1].nextKeyGain.toFixed(1)}</td>
+      <td>{fortRunsExtracted[1].userKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[1].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
       <td>{dungeons.d2}</td>
@@ -226,10 +267,10 @@ function weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,keyLevel){
       <td>{fortRunsExtracted[2].weightedScore.toFixed(1)}</td>
       <td>{tyrRunsExtracted[2].keyLevel}</td>
       <td>{tyrRunsExtracted[2].weightedScore.toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[2].score,fortRunsExtracted[2].score,"Fortified",(fortRunsExtracted[2].keyLevel +1)).toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[2].score,fortRunsExtracted[2].score,"Tyrannical",(tyrRunsExtracted[2].keyLevel +1)).toFixed(1)}</td>
-      <td></td>
-      <td></td>
+      <td>{fortRunsExtracted[2].nextKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[2].nextKeyGain.toFixed(1)}</td>
+      <td>{fortRunsExtracted[2].userKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[2].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
       <td>{dungeons.d3}</td>
@@ -237,10 +278,10 @@ function weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,keyLevel){
       <td>{fortRunsExtracted[3].weightedScore.toFixed(1)}</td>
       <td>{tyrRunsExtracted[3].keyLevel}</td>
       <td>{tyrRunsExtracted[3].weightedScore.toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[3].score,fortRunsExtracted[3].score,"Fortified",(fortRunsExtracted[3].keyLevel +1)).toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[3].score,fortRunsExtracted[3].score,"Tyrannical",(tyrRunsExtracted[3].keyLevel +1)).toFixed(1)}</td>
-      <td></td>
-      <td></td>
+      <td>{fortRunsExtracted[3].nextKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[3].nextKeyGain.toFixed(1)}</td>
+      <td>{fortRunsExtracted[3].userKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[3].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
       <td>{dungeons.d4}</td>
@@ -248,10 +289,10 @@ function weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,keyLevel){
       <td>{fortRunsExtracted[4].weightedScore.toFixed(1)}</td>
       <td>{tyrRunsExtracted[4].keyLevel}</td>
       <td>{tyrRunsExtracted[4].weightedScore.toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[4].score,fortRunsExtracted[4].score,"Fortified",(fortRunsExtracted[4].keyLevel +1)).toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[4].score,fortRunsExtracted[4].score,"Tyrannical",(tyrRunsExtracted[4].keyLevel +1)).toFixed(1)}</td>
-      <td></td>
-      <td></td>
+      <td>{fortRunsExtracted[4].nextKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[4].nextKeyGain.toFixed(1)}</td>
+      <td>{fortRunsExtracted[4].userKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[4].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
       <td>{dungeons.d5}</td>
@@ -259,10 +300,10 @@ function weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,keyLevel){
       <td>{fortRunsExtracted[5].weightedScore.toFixed(1)}</td>
       <td>{tyrRunsExtracted[5].keyLevel}</td>
       <td>{tyrRunsExtracted[5].weightedScore.toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[5].score,fortRunsExtracted[5].score,"Fortified",(fortRunsExtracted[5].keyLevel +1)).toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[5].score,fortRunsExtracted[5].score,"Tyrannical",(tyrRunsExtracted[5].keyLevel +1)).toFixed(1)}</td>
-      <td></td>
-      <td></td>
+      <td>{fortRunsExtracted[5].nextKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[5].nextKeyGain.toFixed(1)}</td>
+      <td>{fortRunsExtracted[5].userKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[5].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
       <td>{dungeons.d6}</td>
@@ -270,10 +311,10 @@ function weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,keyLevel){
       <td>{fortRunsExtracted[6].weightedScore.toFixed(1)}</td>
       <td>{tyrRunsExtracted[6].keyLevel}</td>
       <td>{tyrRunsExtracted[6].weightedScore.toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[6].score,fortRunsExtracted[6].score,"Fortified",(fortRunsExtracted[6].keyLevel +1)).toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[6].score,fortRunsExtracted[6].score,"Tyrannical",(tyrRunsExtracted[6].keyLevel +1)).toFixed(1)}</td>
-      <td></td>
-      <td></td>
+      <td>{fortRunsExtracted[6].nextKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[6].nextKeyGain.toFixed(1)}</td>
+      <td>{fortRunsExtracted[6].userKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[6].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
       <td>{dungeons.d7}</td>
@@ -281,10 +322,10 @@ function weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,keyLevel){
       <td>{fortRunsExtracted[7].weightedScore.toFixed(1)}</td>
       <td>{tyrRunsExtracted[7].keyLevel}</td>
       <td>{tyrRunsExtracted[7].weightedScore.toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[7].score,fortRunsExtracted[7].score,"Fortified",(fortRunsExtracted[7].keyLevel +1)).toFixed(1)}</td>
-      <td>{weightCalcScore(tyrRunsExtracted[7].score,fortRunsExtracted[7].score,"Tyrannical",(tyrRunsExtracted[7].keyLevel +1)).toFixed(1)}</td>
-      <td></td>
-      <td></td>
+      <td>{fortRunsExtracted[7].nextKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[7].nextKeyGain.toFixed(1)}</td>
+      <td>{fortRunsExtracted[7].userKeyGain.toFixed(1)}</td>
+      <td>{tyrRunsExtracted[7].userKeyGain.toFixed(1)}</td>
     </tr>
   </tbody>
 </table>
