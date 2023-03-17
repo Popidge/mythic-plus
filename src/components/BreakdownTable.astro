@@ -5,6 +5,8 @@ const userName ="Titanbeard"
 const apiCall = await fetch('https://raider.io/api/v1/characters/profile?region=' +userRegion+ '&realm=' +userRealm+ '&name=' +userName+ '&fields=mythic_plus_best_runs:all,mythic_plus_alternate_runs:all')
 const data = await apiCall.json();
 
+const userKeyLevel = 15
+
 const dungeons = {
   d0: "Algeth'ar Academy",
   d1: "Court of Stars",
@@ -69,32 +71,38 @@ extractAltRuns();
 extractBestRuns();
 
 //sort arrays by dungeon alphabetically
+function sortFort(){
+    fortRunsExtracted.sort((a,b) => {
+        const nameA = a.dungeon.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.dungeon.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
+        // names must be equal
+        return 0;
+    });
+}
 
-fortRunsExtracted.sort((a,b) => {
-    const nameA = a.dungeon.toUpperCase(); // ignore upper and lowercase
-    const nameB = b.dungeon.toUpperCase(); // ignore upper and lowercase
-    if (nameA < nameB) {
-        return -1;
-    }
-    if (nameA > nameB) {
-        return 1;
-    }
-    // names must be equal
-    return 0;
-});
+function sortTyr(){
+    tyrRunsExtracted.sort((a,b) => {
+        const nameA = a.dungeon.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.dungeon.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
+        // names must be equal
+        return 0;
+    });
+}
 
-tyrRunsExtracted.sort((a,b) => {
-    const nameA = a.dungeon.toUpperCase(); // ignore upper and lowercase
-    const nameB = b.dungeon.toUpperCase(); // ignore upper and lowercase
-    if (nameA < nameB) {
-        return -1;
-    }
-    if (nameA > nameB) {
-        return 1;
-    }
-    // names must be equal
-    return 0;
-});
+sortFort();
+sortTyr();
 
 //computes the weighted scores for m+ rating
 
