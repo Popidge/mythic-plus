@@ -5,7 +5,7 @@ const userName ="Titanbeard"
 const apiCall = await fetch('https://raider.io/api/v1/characters/profile?region=' +userRegion+ '&realm=' +userRealm+ '&name=' +userName+ '&fields=mythic_plus_best_runs:all,mythic_plus_alternate_runs:all')
 const data = await apiCall.json();
 
-const userKeyLevel = 15
+const userKeyLevel = 14
 
 const dungeons = {
   d0: "Algeth'ar Academy",
@@ -114,12 +114,12 @@ function weightScores(){
     if (score1 > score2) {
         fortRunsExtracted[i].weightedScore = (score1*1.5);
         fortRunsExtracted[i].isBest = true;
-        tyrRunsExtracted[i].weightedScore = (score1*0.5);
+        tyrRunsExtracted[i].weightedScore = (score2*0.5);
         tyrRunsExtracted[i].isBest = false;        
     } else if (score2 > score1) {
         fortRunsExtracted[i].weightedScore = (score1*0.5);
         fortRunsExtracted[i].isBest = false;
-        tyrRunsExtracted[i].weightedScore = (score1*1.5);
+        tyrRunsExtracted[i].weightedScore = (score2*1.5);
         tyrRunsExtracted[i].isBest = true; 
     } else {
         fortRunsExtracted[i].weightedScore = score1;
@@ -216,116 +216,152 @@ function generateUserKeyGains() {
 
 generateUserKeyGains();
 
+function keyUpgrades(){
+    const plusUpgrades =["","+","++","+++"];
+    for (let i=0; i<fortRunsExtracted.length; i++){
+        fortRunsExtracted[i].plus = plusUpgrades[fortRunsExtracted[i].upgrades]
+    }
+    for (let i=0; i<tyrRunsExtracted.length; i++){
+    tyrRunsExtracted[i].plus = plusUpgrades[tyrRunsExtracted[i].upgrades]
+    }
+}
+
+keyUpgrades();
+
+const totalScore = function(){
+    let fortScores = 0
+
+    for (let i=0; i<fortRunsExtracted.length; i++){
+        fortScores += fortRunsExtracted[i].weightedScore;
+    }
+
+    let tyrScores = 0
+
+    for (let i=0; i<tyrRunsExtracted.length; i++){
+        tyrScores += tyrRunsExtracted[i].weightedScore;
+    }
+
+    return (fortScores+tyrScores).toFixed(0);
+}
+
 ---
 
-<table>
-  <thead>
+<div class="grid grid-rows-1 grid-cols-4 text-center">
+    <div class="mb-4 font-bold"><h1>{userName}</h1></div>
+    <div class="mb-4 font-bold"><h1>{userRealm}</h1></div>
+    <div class="mb-4 font-bold"><h1>{userRegion}</h1></div>
+    <div class="mb-4 font-bold"><h1>{totalScore}</h1></div>
+    <div class="col-span-4">
+    <table class="border-collapse table-auto w-full text-center border-spacing-1">
+    <thead>
     <tr>
-      <th rowspan="2">Dungeon</th>
-      <th colspan="2">Current Fortified Score</th>
-      <th colspan="2">Current Tyrannical Score</th>
-      <th colspan="2">Gain next key</th>
-      <th colspan="2">Gain user key level({userKeyLevel})</th>
+      <th class="border-solid border-2" rowspan="2">Dungeon</th>
+      <th class="border-solid border-2" colspan="2">Fortified</th>
+      <th class="border-solid border-2" colspan="2">Tyrannical</th>
+      <th class="border-solid border-2" colspan="2">Gain next key<sup>+</sup></th>
+      <th class="border-solid border-2" colspan="2">Gain user key<sup>+</sup> ({userKeyLevel})</th>
     </tr>
     <tr>
-      <th>Key Level</th>
-      <th>Score</th>
-      <th>Key Level</th>
-      <th>Score</th>
-      <th>Fortified</th>
-      <th>Tyrannical</th>
-      <th>Fortified</th>
-      <th>Tyrannical</th>
+      <th class="border-solid border-2">Level</th>
+      <th class="border-solid border-2">Score</th>
+      <th class="border-solid border-2">Level</th>
+      <th class="border-solid border-2">Score</th>
+      <th class="border-solid border-2">Fortified</th>
+      <th class="border-solid border-2">Tyrannical</th>
+      <th class="border-solid border-2">Fortified</th>
+      <th class="border-solid border-2">Tyrannical</th>
     </tr>
-  </thead>
-  <tbody>
+    </thead>
+    <tbody>
     <tr>
-      <td>{dungeons.d0}</td>
-      <td>{fortRunsExtracted[0].keyLevel}</td>
-      <td>{fortRunsExtracted[0].weightedScore.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[0].keyLevel}</td>
-      <td>{tyrRunsExtracted[0].weightedScore.toFixed(1)}</td>
-      <td>{fortRunsExtracted[0].nextKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[0].nextKeyGain.toFixed(1)}</td>
-      <td>{fortRunsExtracted[0].userKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[0].userKeyGain.toFixed(1)}</td>
-    </tr>
-    <tr>
-      <td>{dungeons.d1}</td>
-      <td>{fortRunsExtracted[1].keyLevel}</td>
-      <td>{fortRunsExtracted[1].weightedScore.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[1].keyLevel}</td>
-      <td>{tyrRunsExtracted[1].weightedScore.toFixed(1)}</td>
-      <td>{fortRunsExtracted[1].nextKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[1].nextKeyGain.toFixed(1)}</td>
-      <td>{fortRunsExtracted[1].userKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[1].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{dungeons.d0}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[0].keyLevel}<sup>{fortRunsExtracted[0].plus}</sup></td>
+      <td class="border-solid border-2">{fortRunsExtracted[0].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[0].keyLevel}<sup>{tyrRunsExtracted[0].plus}</sup></td>
+      <td class="border-solid border-2">{tyrRunsExtracted[0].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[0].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[0].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[0].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[0].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td>{dungeons.d2}</td>
-      <td>{fortRunsExtracted[2].keyLevel}</td>
-      <td>{fortRunsExtracted[2].weightedScore.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[2].keyLevel}</td>
-      <td>{tyrRunsExtracted[2].weightedScore.toFixed(1)}</td>
-      <td>{fortRunsExtracted[2].nextKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[2].nextKeyGain.toFixed(1)}</td>
-      <td>{fortRunsExtracted[2].userKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[2].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{dungeons.d1}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[1].keyLevel}<sup>{fortRunsExtracted[1].plus}</sup></td>
+      <td class="border-solid border-2">{fortRunsExtracted[1].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[1].keyLevel}<sup>{tyrRunsExtracted[1].plus}</sup></td>
+      <td class="border-solid border-2">{tyrRunsExtracted[1].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[1].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[1].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[1].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[1].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td>{dungeons.d3}</td>
-      <td>{fortRunsExtracted[3].keyLevel}</td>
-      <td>{fortRunsExtracted[3].weightedScore.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[3].keyLevel}</td>
-      <td>{tyrRunsExtracted[3].weightedScore.toFixed(1)}</td>
-      <td>{fortRunsExtracted[3].nextKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[3].nextKeyGain.toFixed(1)}</td>
-      <td>{fortRunsExtracted[3].userKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[3].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{dungeons.d2}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[2].keyLevel}<sup>{fortRunsExtracted[2].plus}</sup></td>
+      <td class="border-solid border-2">{fortRunsExtracted[2].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[2].keyLevel}<sup>{tyrRunsExtracted[2].plus}</sup></td>
+      <td class="border-solid border-2">{tyrRunsExtracted[2].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[2].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[2].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[2].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[2].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td>{dungeons.d4}</td>
-      <td>{fortRunsExtracted[4].keyLevel}</td>
-      <td>{fortRunsExtracted[4].weightedScore.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[4].keyLevel}</td>
-      <td>{tyrRunsExtracted[4].weightedScore.toFixed(1)}</td>
-      <td>{fortRunsExtracted[4].nextKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[4].nextKeyGain.toFixed(1)}</td>
-      <td>{fortRunsExtracted[4].userKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[4].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{dungeons.d3}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[3].keyLevel}<sup>{fortRunsExtracted[3].plus}</sup></td>
+      <td class="border-solid border-2">{fortRunsExtracted[3].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[3].keyLevel}<sup>{tyrRunsExtracted[3].plus}</sup></td>
+      <td class="border-solid border-2">{tyrRunsExtracted[3].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[3].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[3].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[3].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[3].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td>{dungeons.d5}</td>
-      <td>{fortRunsExtracted[5].keyLevel}</td>
-      <td>{fortRunsExtracted[5].weightedScore.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[5].keyLevel}</td>
-      <td>{tyrRunsExtracted[5].weightedScore.toFixed(1)}</td>
-      <td>{fortRunsExtracted[5].nextKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[5].nextKeyGain.toFixed(1)}</td>
-      <td>{fortRunsExtracted[5].userKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[5].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{dungeons.d4}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[4].keyLevel}<sup>{fortRunsExtracted[4].plus}</sup></td>
+      <td class="border-solid border-2">{fortRunsExtracted[4].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[4].keyLevel}<sup>{tyrRunsExtracted[4].plus}</sup></td>
+      <td class="border-solid border-2">{tyrRunsExtracted[4].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[4].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[4].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[4].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[4].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td>{dungeons.d6}</td>
-      <td>{fortRunsExtracted[6].keyLevel}</td>
-      <td>{fortRunsExtracted[6].weightedScore.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[6].keyLevel}</td>
-      <td>{tyrRunsExtracted[6].weightedScore.toFixed(1)}</td>
-      <td>{fortRunsExtracted[6].nextKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[6].nextKeyGain.toFixed(1)}</td>
-      <td>{fortRunsExtracted[6].userKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[6].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{dungeons.d5}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[5].keyLevel}<sup>{fortRunsExtracted[5].plus}</sup></td>
+      <td class="border-solid border-2">{fortRunsExtracted[5].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[5].keyLevel}<sup>{tyrRunsExtracted[5].plus}</sup></td>
+      <td class="border-solid border-2">{tyrRunsExtracted[5].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[5].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[5].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[5].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[5].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td>{dungeons.d7}</td>
-      <td>{fortRunsExtracted[7].keyLevel}</td>
-      <td>{fortRunsExtracted[7].weightedScore.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[7].keyLevel}</td>
-      <td>{tyrRunsExtracted[7].weightedScore.toFixed(1)}</td>
-      <td>{fortRunsExtracted[7].nextKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[7].nextKeyGain.toFixed(1)}</td>
-      <td>{fortRunsExtracted[7].userKeyGain.toFixed(1)}</td>
-      <td>{tyrRunsExtracted[7].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{dungeons.d6}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[6].keyLevel}<sup>{fortRunsExtracted[6].plus}</sup></td>
+      <td class="border-solid border-2">{fortRunsExtracted[6].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[6].keyLevel}<sup>{tyrRunsExtracted[6].plus}</sup></td>
+      <td class="border-solid border-2">{tyrRunsExtracted[6].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[6].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[6].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[6].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[6].userKeyGain.toFixed(1)}</td>
     </tr>
-  </tbody>
-</table>
+    <tr>
+      <td class="border-solid border-2">{dungeons.d7}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[7].keyLevel}<sup>{fortRunsExtracted[7].plus}</sup></td>
+      <td class="border-solid border-2">{fortRunsExtracted[7].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[7].keyLevel}<sup>{tyrRunsExtracted[7].plus}</sup></td>
+      <td class="border-solid border-2">{tyrRunsExtracted[7].weightedScore.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[7].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[7].nextKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{fortRunsExtracted[7].userKeyGain.toFixed(1)}</td>
+      <td class="border-solid border-2">{tyrRunsExtracted[7].userKeyGain.toFixed(1)}</td>
+    </tr>
+    </tbody>
+    </table>
+    </div>
+</div>
