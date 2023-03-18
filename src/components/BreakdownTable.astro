@@ -1,8 +1,6 @@
 ---
 const {userRegion,userRealm,userName,userKey} = Astro.props;
-// const userRegion = "EU"
-// const userRealm = "Silvermoon"
-// const userName ="Titanbeard"
+//TODO - catch a 200 response from the raider.io API
 const apiCall = await fetch('https://raider.io/api/v1/characters/profile?region=' +userRegion+ '&realm=' +userRealm+ '&name=' +userName+ '&fields=mythic_plus_best_runs:all,mythic_plus_alternate_runs:all')
 const data = await apiCall.json();
 
@@ -48,8 +46,6 @@ function extractAltRuns(){
         specificObject.score = altRunsData[i].score;
         specificObject.affixWeek = altRunsData[i].affixes[0].name;
         specificObject.upgrades = altRunsData[i].num_keystone_upgrades;
-        specificObject.completeTime = altRunsData[i].clear_time_ms;
-        specificObject.parTime = altRunsData[i].par_time_ms;
 
         if (specificObject.affixWeek === "Tyrannical"){
             tyrRunsExtracted.push(specificObject);
@@ -99,7 +95,7 @@ sortTyr();
 //check array for missing runs and insert blank ones in the correct spaces
 function populateFort(){
     for(let i=0; i<dungeons.length; i++){
-        let specificObject = {dungeon:dungeons[i],keyLevel:0,score:0,affixWeek:"Fortified",upgrades:0,completeTime:0,parTime:0};
+        let specificObject = {dungeon:dungeons[i],keyLevel:0,score:0,affixWeek:"Fortified",upgrades:0};
         if (fortRunsExtracted[i].dungeon != dungeons[i]){
             fortRunsExtracted.splice(i,0,specificObject)
         }
@@ -108,7 +104,7 @@ function populateFort(){
 
 function populateTyr(){
     for(let i=0; i<dungeons.length; i++){
-        let specificObject = {dungeon:dungeons[i],keyLevel:0,score:0,affixWeek:"Tyrannical",upgrades:0,completeTime:0,parTime:0};
+        let specificObject = {dungeon:dungeons[i],keyLevel:0,score:0,affixWeek:"Tyrannical",upgrades:0};
         if (tyrRunsExtracted[i].dungeon != dungeons[i]){
             tyrRunsExtracted.splice(i,0,specificObject)
         }
