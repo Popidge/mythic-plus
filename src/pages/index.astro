@@ -2,6 +2,8 @@
 import Layout from '../layouts/Layout.astro';
 import CharacterSelector from '../components/CharacterSelector.astro';
 
+export const prerender = true;
+
 if (Astro.request.method === "POST") {
   var url=''
   try {

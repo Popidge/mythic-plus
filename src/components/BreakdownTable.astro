@@ -16,6 +16,25 @@ let tyrRunsExtracted = [];
 
 function extractBestRuns(){
     let bestRunsData = data.mythic_plus_best_runs;
+    
+    //catches if there are no best runs and returns objects with "0" values
+
+    if (bestRunsData.length === 0) {
+        for (let i=0; i<dungeons.length; i++){
+        let defaultObject={};
+
+        defaultObject.dungeon = dungeons[i];
+        defaultObject.keyLevel = 0;
+        defaultObject.score = 0;
+        defaultObject.affixWeek = "Fortified";
+        defaultObject.upgrades = 0;
+
+        fortRunsExtracted.push(defaultObject);
+
+        defaultObject.affixWeek = "Tyrannical"
+        tyrRunsExtracted.push(defaultObject);
+    }} else {
+
     for(let i=0; i<bestRunsData.length; i++){
         let specificObject={};
 
@@ -30,12 +49,37 @@ function extractBestRuns(){
         } else {
         tyrRunsExtracted.push(specificObject);
         }
-}};
+    
+}}};
 
 //extract from alt runs to relevant array
 
 function extractAltRuns(){
     let altRunsData = data.mythic_plus_alternate_runs;
+    let bestRunsData = data.mythic_plus_best_runs;
+
+    if (altRunsData.length === 0 && bestRunsData[0].affixes[0].name === "Fortified") {
+        let defaultObject={};
+
+        defaultObject.dungeon = dungeons[i];
+        defaultObject.keyLevel = 0;
+        defaultObject.score = 0;
+        defaultObject.affixWeek = "Tyrannical";
+        defaultObject.upgrades = 0;
+
+        tyrRunsExtracted.push(defaultObject);
+    } else if (altRunsData.length === 0 && bestRunsData[0].affixes[0].name === "Tyrannical") {
+        let defaultObject={};
+
+        defaultObject.dungeon = dungeons[i];
+        defaultObject.keyLevel = 0;
+        defaultObject.score = 0;
+        defaultObject.affixWeek = "Tyrannical";
+        defaultObject.upgrades = 0;
+
+        fortRunsExtracted.push(defaultObject);
+    } else{
+
     for(let i=0; i<altRunsData.length; i++){
         let specificObject={};
 
@@ -51,10 +95,10 @@ function extractAltRuns(){
             fortRunsExtracted.push(specificObject);
         }
     }
-};
+}};
 
-extractAltRuns();
 extractBestRuns();
+extractAltRuns();
 
 //sort arrays by dungeon alphabetically
 function sortFort(){
@@ -87,24 +131,40 @@ function sortTyr(){
     });
 }
 
-sortFort();
-sortTyr();
+if (fortRunsExtracted.length > 1){
+    sortFort();
+    }
+ 
+if (tyrRunsExtracted.length > 1){
+    sortTyr();
+    }
 
 //check array for missing runs and insert blank ones in the correct spaces
+
 function populateFort(){
     for(let i=0; i<dungeons.length; i++){
-        let specificObject = {dungeon:dungeons[i],keyLevel:0,score:0,affixWeek:"Fortified",upgrades:0};
+        //check if current dungeon matches corresponding in extracted array, if it doesn't, put it in
         if (fortRunsExtracted[i].dungeon != dungeons[i]){
+            let specificObject = {dungeon:dungeons[i],keyLevel:0,score:0,affixWeek:"Fortified",upgrades:0};
             fortRunsExtracted.splice(i,0,specificObject)
+        //if it does, check if the array is full (8 objects), if not, put the next one in
+        } else if (fortRunsExtracted[i].dungeon === dungeons[i] && fortRunsExtracted.length < dungeons.length){
+            let specificObject = {dungeon:dungeons[i+1],keyLevel:0,score:0,affixWeek:"Fortified",upgrades:0};
+            fortRunsExtracted.splice(i+1,0,specificObject)
         }
+        //won't do anything if the array is fully populated
     }
 }
 
 function populateTyr(){
     for(let i=0; i<dungeons.length; i++){
-        let specificObject = {dungeon:dungeons[i],keyLevel:0,score:0,affixWeek:"Tyrannical",upgrades:0};
+        
         if (tyrRunsExtracted[i].dungeon != dungeons[i]){
+            let specificObject = {dungeon:dungeons[i],keyLevel:0,score:0,affixWeek:"Tyrannical",upgrades:0};
             tyrRunsExtracted.splice(i,0,specificObject)
+        } else if (tyrRunsExtracted[i].dungeon === dungeons[i] && tyrRunsExtracted.length < dungeons.length){
+            let specificObject = {dungeon:dungeons[i+1],keyLevel:0,score:0,affixWeek:"Tyrannical",upgrades:0};
+            tyrRunsExtracted.splice(i+1,0,specificObject)
         }
     }
 }
@@ -117,6 +177,7 @@ if (fortRunsExtracted.length != dungeons.length){
 if (tyrRunsExtracted.length != dungeons.length){
     populateTyr();
 }
+
 
 //computes the weighted scores for m+ rating
 
