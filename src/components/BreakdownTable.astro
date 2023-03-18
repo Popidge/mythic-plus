@@ -1,22 +1,10 @@
 ---
-const userRegion = "EU"
-const userRealm = "Silvermoon"
-const userName ="Titanbeard"
+const {userRegion,userRealm,userName,userKey} = Astro.props;
+//TODO - catch a 200 response from the raider.io API
 const apiCall = await fetch('https://raider.io/api/v1/characters/profile?region=' +userRegion+ '&realm=' +userRealm+ '&name=' +userName+ '&fields=mythic_plus_best_runs:all,mythic_plus_alternate_runs:all')
 const data = await apiCall.json();
 
-const userKeyLevel = 14
-
-const dungeons = {
-  d0: "Algeth'ar Academy",
-  d1: "Court of Stars",
-  d2: "Halls of Valor",
-  d3: "Ruby Life Pools",
-  d4: "Shadowmoon Burial Grounds",
-  d5: "Temple of the Jade Serpent",
-  d6: "The Azure Vault",
-  d7: "The Nokhud Offensive",
-};
+const dungeons = ["Algeth'ar Academy", "Court of Stars","Halls of Valor","Ruby Life Pools","Shadowmoon Burial Grounds","Temple of the Jade Serpent","The Azure Vault","The Nokhud Offensive",];
 
 //create arrays for fort and tyr runs
 let fortRunsExtracted = [];
@@ -56,8 +44,6 @@ function extractAltRuns(){
         specificObject.score = altRunsData[i].score;
         specificObject.affixWeek = altRunsData[i].affixes[0].name;
         specificObject.upgrades = altRunsData[i].num_keystone_upgrades;
-        specificObject.completeTime = altRunsData[i].clear_time_ms;
-        specificObject.parTime = altRunsData[i].par_time_ms;
 
         if (specificObject.affixWeek === "Tyrannical"){
             tyrRunsExtracted.push(specificObject);
@@ -103,6 +89,34 @@ function sortTyr(){
 
 sortFort();
 sortTyr();
+
+//check array for missing runs and insert blank ones in the correct spaces
+function populateFort(){
+    for(let i=0; i<dungeons.length; i++){
+        let specificObject = {dungeon:dungeons[i],keyLevel:0,score:0,affixWeek:"Fortified",upgrades:0};
+        if (fortRunsExtracted[i].dungeon != dungeons[i]){
+            fortRunsExtracted.splice(i,0,specificObject)
+        }
+    }
+}
+
+function populateTyr(){
+    for(let i=0; i<dungeons.length; i++){
+        let specificObject = {dungeon:dungeons[i],keyLevel:0,score:0,affixWeek:"Tyrannical",upgrades:0};
+        if (tyrRunsExtracted[i].dungeon != dungeons[i]){
+            tyrRunsExtracted.splice(i,0,specificObject)
+        }
+    }
+}
+
+//only calls above function if we dont have a run for each dungeon
+if (fortRunsExtracted.length != dungeons.length){
+    populateFort();
+}
+
+if (tyrRunsExtracted.length != dungeons.length){
+    populateTyr();
+}
 
 //computes the weighted scores for m+ rating
 
@@ -195,6 +209,34 @@ function generateNextKeyGains() {
 
 generateNextKeyGains();
 
+//gets highest timed key level of current runs
+
+function generateHighestKey(){
+    let highestKey = 0
+
+    for (let i = 0; i<fortRunsExtracted.length; i++){
+        if (fortRunsExtracted[i].keyLevel > highestKey && fortRunsExtracted[i].upgrades > 0){
+            highestKey = fortRunsExtracted[i].keyLevel;
+        } else if (fortRunsExtracted[i].keyLevel > highestKey) {
+            highestKey = fortRunsExtracted[i].keyLevel;
+        }
+    }
+
+    for (let i = 0; i<tyrRunsExtracted.length; i++){
+        if (tyrRunsExtracted[i].keyLevel > highestKey && tyrRunsExtracted[i].upgrades > 0){
+            highestKey = tyrRunsExtracted[i].keyLevel;
+        } else if (tyrRunsExtracted[i].keyLevel > highestKey) {
+            highestKey = fortRunsExtracted[i].keyLevel;
+        }
+    }
+
+    return highestKey;
+}
+
+const highestKey = generateHighestKey();
+
+const userKeyLevel = highestKey;
+
 function generateUserKeyGains() {
     for (let i=0; i<fortRunsExtracted.length; i++) {
         let tyrCurrentBase = tyrRunsExtracted[i].score;
@@ -228,6 +270,8 @@ function keyUpgrades(){
 
 keyUpgrades();
 
+//calculates current total score
+
 const totalScore = function(){
     let fortScores = 0
 
@@ -246,12 +290,13 @@ const totalScore = function(){
 
 ---
 
-<div class="grid grid-rows-1 grid-cols-4 text-center">
-    <div class="mb-4 font-bold"><h1>{userName}</h1></div>
-    <div class="mb-4 font-bold"><h1>{userRealm}</h1></div>
-    <div class="mb-4 font-bold"><h1>{userRegion}</h1></div>
-    <div class="mb-4 font-bold"><h1>{totalScore}</h1></div>
-    <div class="col-span-4">
+<div class="grid grid-rows-1 grid-cols-5 text-center m-10">
+    <div class="mb-4 font-bold capitalize"><h1>{userName}</h1></div>
+    <div class="mb-4 font-bold capitalize"><h1>{userRealm}</h1></div>
+    <div class="mb-4 font-bold uppercase"><h1>{userRegion}</h1></div>
+    <div class="mb-4 font-bold"><h1>Current Score: {totalScore}</h1></div>
+    <div class="mb-4 font-bold"><h1>Highest Timed Level: {userKeyLevel}</h1></div>
+    <div class="col-span-5">
     <table class="border-collapse table-auto w-full text-center border-spacing-1">
     <thead>
     <tr>
@@ -259,7 +304,7 @@ const totalScore = function(){
       <th class="border-solid border-2" colspan="2">Fortified</th>
       <th class="border-solid border-2" colspan="2">Tyrannical</th>
       <th class="border-solid border-2" colspan="2">Gain next key<sup>+</sup></th>
-      <th class="border-solid border-2" colspan="2">Gain user key<sup>+</sup> ({userKeyLevel})</th>
+      <th class="border-solid border-2" colspan="2">Gain highest key<sup>+</sup> ({userKeyLevel})</th>
     </tr>
     <tr>
       <th class="border-solid border-2">Level</th>
@@ -274,7 +319,7 @@ const totalScore = function(){
     </thead>
     <tbody>
     <tr>
-      <td class="border-solid border-2">{dungeons.d0}</td>
+      <td class="border-solid border-2">{dungeons[0]}</td>
       <td class="border-solid border-2">{fortRunsExtracted[0].keyLevel}<sup>{fortRunsExtracted[0].plus}</sup></td>
       <td class="border-solid border-2">{fortRunsExtracted[0].weightedScore.toFixed(1)}</td>
       <td class="border-solid border-2">{tyrRunsExtracted[0].keyLevel}<sup>{tyrRunsExtracted[0].plus}</sup></td>
@@ -285,7 +330,7 @@ const totalScore = function(){
       <td class="border-solid border-2">{tyrRunsExtracted[0].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td class="border-solid border-2">{dungeons.d1}</td>
+      <td class="border-solid border-2">{dungeons[1]}</td>
       <td class="border-solid border-2">{fortRunsExtracted[1].keyLevel}<sup>{fortRunsExtracted[1].plus}</sup></td>
       <td class="border-solid border-2">{fortRunsExtracted[1].weightedScore.toFixed(1)}</td>
       <td class="border-solid border-2">{tyrRunsExtracted[1].keyLevel}<sup>{tyrRunsExtracted[1].plus}</sup></td>
@@ -296,7 +341,7 @@ const totalScore = function(){
       <td class="border-solid border-2">{tyrRunsExtracted[1].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td class="border-solid border-2">{dungeons.d2}</td>
+      <td class="border-solid border-2">{dungeons[2]}</td>
       <td class="border-solid border-2">{fortRunsExtracted[2].keyLevel}<sup>{fortRunsExtracted[2].plus}</sup></td>
       <td class="border-solid border-2">{fortRunsExtracted[2].weightedScore.toFixed(1)}</td>
       <td class="border-solid border-2">{tyrRunsExtracted[2].keyLevel}<sup>{tyrRunsExtracted[2].plus}</sup></td>
@@ -307,7 +352,7 @@ const totalScore = function(){
       <td class="border-solid border-2">{tyrRunsExtracted[2].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td class="border-solid border-2">{dungeons.d3}</td>
+      <td class="border-solid border-2">{dungeons[3]}</td>
       <td class="border-solid border-2">{fortRunsExtracted[3].keyLevel}<sup>{fortRunsExtracted[3].plus}</sup></td>
       <td class="border-solid border-2">{fortRunsExtracted[3].weightedScore.toFixed(1)}</td>
       <td class="border-solid border-2">{tyrRunsExtracted[3].keyLevel}<sup>{tyrRunsExtracted[3].plus}</sup></td>
@@ -318,7 +363,7 @@ const totalScore = function(){
       <td class="border-solid border-2">{tyrRunsExtracted[3].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td class="border-solid border-2">{dungeons.d4}</td>
+      <td class="border-solid border-2">{dungeons[4]}</td>
       <td class="border-solid border-2">{fortRunsExtracted[4].keyLevel}<sup>{fortRunsExtracted[4].plus}</sup></td>
       <td class="border-solid border-2">{fortRunsExtracted[4].weightedScore.toFixed(1)}</td>
       <td class="border-solid border-2">{tyrRunsExtracted[4].keyLevel}<sup>{tyrRunsExtracted[4].plus}</sup></td>
@@ -329,7 +374,7 @@ const totalScore = function(){
       <td class="border-solid border-2">{tyrRunsExtracted[4].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td class="border-solid border-2">{dungeons.d5}</td>
+      <td class="border-solid border-2">{dungeons[5]}</td>
       <td class="border-solid border-2">{fortRunsExtracted[5].keyLevel}<sup>{fortRunsExtracted[5].plus}</sup></td>
       <td class="border-solid border-2">{fortRunsExtracted[5].weightedScore.toFixed(1)}</td>
       <td class="border-solid border-2">{tyrRunsExtracted[5].keyLevel}<sup>{tyrRunsExtracted[5].plus}</sup></td>
@@ -340,7 +385,7 @@ const totalScore = function(){
       <td class="border-solid border-2">{tyrRunsExtracted[5].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td class="border-solid border-2">{dungeons.d6}</td>
+      <td class="border-solid border-2">{dungeons[6]}</td>
       <td class="border-solid border-2">{fortRunsExtracted[6].keyLevel}<sup>{fortRunsExtracted[6].plus}</sup></td>
       <td class="border-solid border-2">{fortRunsExtracted[6].weightedScore.toFixed(1)}</td>
       <td class="border-solid border-2">{tyrRunsExtracted[6].keyLevel}<sup>{tyrRunsExtracted[6].plus}</sup></td>
@@ -351,7 +396,7 @@ const totalScore = function(){
       <td class="border-solid border-2">{tyrRunsExtracted[6].userKeyGain.toFixed(1)}</td>
     </tr>
     <tr>
-      <td class="border-solid border-2">{dungeons.d7}</td>
+      <td class="border-solid border-2">{dungeons[7]}</td>
       <td class="border-solid border-2">{fortRunsExtracted[7].keyLevel}<sup>{fortRunsExtracted[7].plus}</sup></td>
       <td class="border-solid border-2">{fortRunsExtracted[7].weightedScore.toFixed(1)}</td>
       <td class="border-solid border-2">{tyrRunsExtracted[7].keyLevel}<sup>{tyrRunsExtracted[7].plus}</sup></td>
