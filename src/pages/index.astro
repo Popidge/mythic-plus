@@ -1,11 +1,28 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import BreakdownTable from '../components/BreakdownTable.astro';
 import CharacterSelector from '../components/CharacterSelector.astro';
+
+if (Astro.request.method === "POST") {
+  var url=''
+  try {
+    const data = await Astro.request.formData();
+    const region = data.get("region");
+    const realm = data.get("realm");
+    const name = data.get("name");
+    url = '/'+region+'/'+realm+'/'+name;
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+      url='/404'
+    }
+  }
+  //console.log(url);
+  return Astro.redirect(url);
+}
 ---
 
 <Layout title="M+ Score Calculator.">
-	<BreakdownTable userRegion="EU" userRealm="Silvermoon" userName="Titanbeard" userKey="15"/>
+	<CharacterSelector/>
 </Layout>
 
 <style>
