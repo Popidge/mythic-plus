@@ -8,6 +8,8 @@ The character pages are built dynamically using the Astro 🚀 Framework, with b
 
 It's deployed and hosted on Netlify
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/5ebcca9e-bc6b-476d-9d7c-19d8bf16c695/deploy-status)](https://app.netlify.com/sites/mythic-plus-calculator/deploys)
+
 Feel free to contribute or fork for your own projects, as long as you attribute me!
 
 # TODO
