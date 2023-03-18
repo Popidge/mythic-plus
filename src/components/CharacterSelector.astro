@@ -1,5 +1,24 @@
 ---
+export interface Props {
+      region: any;
+      realm: any;
+      name: any;
+}
 
+let {region,realm,name} = Astro.props
+
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    region = data.get("region");
+    realm = data.get("realm");
+    name = data.get("name");
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
 ---
 
 <div class="container w-full max-w-xs mx-auto my-6">

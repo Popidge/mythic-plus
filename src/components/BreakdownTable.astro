@@ -1,7 +1,8 @@
 ---
-const userRegion = "EU"
-const userRealm = "Silvermoon"
-const userName ="Titanbeard"
+const {userRegion,userRealm,userName,userKey} = Astro.props;
+// const userRegion = "EU"
+// const userRealm = "Silvermoon"
+// const userName ="Titanbeard"
 const apiCall = await fetch('https://raider.io/api/v1/characters/profile?region=' +userRegion+ '&realm=' +userRealm+ '&name=' +userName+ '&fields=mythic_plus_best_runs:all,mythic_plus_alternate_runs:all')
 const data = await apiCall.json();
 
@@ -246,12 +247,13 @@ const totalScore = function(){
 
 ---
 
-<div class="grid grid-rows-1 grid-cols-4 text-center">
+<div class="grid grid-rows-1 grid-cols-5 text-center">
     <div class="mb-4 font-bold"><h1>{userName}</h1></div>
     <div class="mb-4 font-bold"><h1>{userRealm}</h1></div>
     <div class="mb-4 font-bold"><h1>{userRegion}</h1></div>
-    <div class="mb-4 font-bold"><h1>{totalScore}</h1></div>
-    <div class="col-span-4">
+    <div class="mb-4 font-bold"><h1>Current Score: {totalScore}</h1></div>
+    <div class="mb-4 font-bold"><h1>User Key Level: {userKeyLevel}</h1></div>
+    <div class="col-span-5">
     <table class="border-collapse table-auto w-full text-center border-spacing-1">
     <thead>
     <tr>

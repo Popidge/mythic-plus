@@ -1,0 +1,23 @@
+---
+import BreakdownTable from "../../../components/BreakdownTable.astro";
+import Layout from "../../../layouts/Layout.astro";
+const {region,realm,name} = Astro.params
+
+---
+
+<Layout title="M+ Calculator">
+	<BreakdownTable userRegion={region} userRealm={realm} userName={name}/>
+</Layout>
+
+<style>
+	main {
+		margin: auto;
+		padding: 1.5rem;
+		max-width: 100ch;
+	}
+	h1 {
+		font-size: 3rem;
+		font-weight: 800;
+		margin: 0;
+	}
+</style>
