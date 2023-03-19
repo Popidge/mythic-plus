@@ -12,182 +12,79 @@ const dungeons = ["Algeth'ar Academy", "Court of Stars","Halls of Valor","Ruby L
 let fortRunsExtracted = [];
 let tyrRunsExtracted = [];
 
-//extract from best runs to relevant array
-let bestRunsData = data.mythic_plus_best_runs;
-function extractBestRuns(){ 
-    //catches if there are no best runs and returns first object with "0" values (rest populated later)
+//REWRITE - EXTRACTING THE DATA FROM R.IO INTO SEPARATE ARRAYS FOR FORT+TYR
 
-    if (bestRunsData.length === 0) {
-        let defaultFortObject={};
 
-        defaultFortObject.dungeon = dungeons[0];
-        defaultFortObject.keyLevel = 0;
-        defaultFortObject.score = 0;
-        defaultFortObject.affixWeek = "Fortified";
-        defaultFortObject.upgrades = 0;
-
-        fortRunsExtracted.push(defaultFortObject);
-
-        let defaultTyrObject={};
-
-        defaultTyrObject.dungeon = dungeons[0];
-        defaultTyrObject.keyLevel = 0;
-        defaultTyrObject.score = 0;
-        defaultTyrObject.affixWeek = "Tyrannical";
-        defaultTyrObject.upgrades = 0;
-
-        tyrRunsExtracted.push(defaultTyrObject);
-
-    } else if (bestRunsData.length != 0) {
-
-    for(let i=0; i<bestRunsData.length; i++){
-        let specificObject={};
-
-        specificObject.dungeon = bestRunsData[i].dungeon;
-        specificObject.keyLevel = bestRunsData[i].mythic_level;
-        specificObject.score = bestRunsData[i].score;
-        specificObject.affixWeek = bestRunsData[i].affixes[0].name;
-        specificObject.upgrades = bestRunsData[i].num_keystone_upgrades;
-
-        if (specificObject.affixWeek === "Fortified"){
-        fortRunsExtracted.push(specificObject);
-        } else {
-        tyrRunsExtracted.push(specificObject);
-        }
+function populateDefaults(){
+	for (let i=0; i<dungeons.length; i++){
+    let defaultFortObject = {};
     
-}}};
+    defaultFortObject.dungeon = dungeons[i];
+    defaultFortObject.keyLevel = 0;
+    defaultFortObject.score = 0;
+    defaultFortObject.affixWeek = "Fortified";
+    defaultFortObject.upgrades = 0;
+    
+    fortRunsExtracted.push(defaultFortObject);
+    
+    let defaultTyrObject={};
 
-//extract from alt runs to relevant array
-let altRunsData = data.mythic_plus_alternate_runs;
-function extractAltRuns(){
+    defaultTyrObject.dungeon = dungeons[i];
+    defaultTyrObject.keyLevel = 0;
+    defaultTyrObject.score = 0;
+    defaultTyrObject.affixWeek = "Tyrannical";
+    defaultTyrObject.upgrades = 0;
 
-    if (altRunsData.length === 0 && bestRunsData[0].affixes[0].name === "Fortified") {
-        if (tyrRunsExtracted.length === 0){
-        let defaultObject={};
+    tyrRunsExtracted.push(defaultTyrObject);
+    
+  }
+}
 
-        defaultObject.dungeon = dungeons[0];
-        defaultObject.keyLevel = 0;
-        defaultObject.score = 0;
-        defaultObject.affixWeek = "Tyrannical";
-        defaultObject.upgrades = 0;
+populateDefaults();
 
-        tyrRunsExtracted.push(defaultObject);}
+//For each dungeon, loop through the best and alt runs if they exist, check which dungeon/affix it is for and replace the values in the blank array
 
-    } else if (altRunsData.length === 0 && bestRunsData[0].affixes[0].name === "Tyrannical") {
-        if (fortRunsExtracted.length === 0){
-        let defaultObject={};
-
-        defaultObject.dungeon = dungeons[0];
-        defaultObject.keyLevel = 0;
-        defaultObject.score = 0;
-        defaultObject.affixWeek = "Fortified";
-        defaultObject.upgrades = 0;
-
-        fortRunsExtracted.push(defaultObject);}
-    } else if (altRunsData.length != 0) {
-
-    for(let i=0; i<altRunsData.length; i++){
-        let specificObject={};
-
-        specificObject.dungeon = altRunsData[i].dungeon;
-        specificObject.keyLevel = altRunsData[i].mythic_level;
-        specificObject.score = altRunsData[i].score;
-        specificObject.affixWeek = altRunsData[i].affixes[0].name;
-        specificObject.upgrades = altRunsData[i].num_keystone_upgrades;
-
-        if (specificObject.affixWeek === "Tyrannical"){
-            tyrRunsExtracted.push(specificObject);
-        } else {
-            fortRunsExtracted.push(specificObject);
+function replaceWithData(){
+	let bestRunsData = data.mythic_plus_best_runs;
+  for (let i=0; i<dungeons.length;i++){
+  	if (bestRunsData.length === 0){
+    	return;
+    } else {
+    	for (let x=0; x<bestRunsData.length;x++){
+      	if (bestRunsData[x].dungeon === dungeons[i] && bestRunsData[x].affixes[0].name === "Fortified"){
+        	fortRunsExtracted[i].keyLevel = bestRunsData[x].mythic_level;
+          fortRunsExtracted[i].score = bestRunsData[x].score;
+          fortRunsExtracted[i].upgrades = bestRunsData[x].num_keystone_upgrades;
+        } else if (bestRunsData[x].dungeon === dungeons[i] && bestRunsData[x].affixes[0].name === "Tyrannical") {
+          tyrRunsExtracted[i].keyLevel = bestRunsData[x].mythic_level;
+          tyrRunsExtracted[i].score = bestRunsData[x].score;
+          tyrRunsExtracted[i].upgrades = bestRunsData[x].num_keystone_upgrades;
         }
+      }
     }
-}};
-
-extractBestRuns();
-if (bestRunsData.length !=0){
-extractAltRuns();
-}
-
-console.log(tyrRunsExtracted)
-console.log(fortRunsExtracted)
-
-//sort arrays by dungeon alphabetically
-function sortFort(){
-    fortRunsExtracted.sort((a,b) => {
-        const nameA = a.dungeon.toUpperCase(); // ignore upper and lowercase
-        const nameB = b.dungeon.toUpperCase(); // ignore upper and lowercase
-        if (nameA < nameB) {
-            return -1;
+  }
+  
+  let altRunsData = data.mythic_plus_alternate_runs;
+ 	for (let i=0; i<dungeons.length;i++){
+  	if (altRunsData.length === 0){
+    	return;
+    } else {
+    	for (let x=0; x<altRunsData.length;x++){
+      	if (altRunsData[x].dungeon === dungeons[i] && altRunsData[x].affixes[0].name === "Fortified"){
+        	fortRunsExtracted[i].keyLevel = altRunsData[x].mythic_level;
+          fortRunsExtracted[i].score = altRunsData[x].score;
+          fortRunsExtracted[i].upgrades = altRunsData[x].num_keystone_upgrades;
+        } else if (altRunsData[x].dungeon === dungeons[i] && altRunsData[x].affixes[0].name === "Tyrannical") {
+          tyrRunsExtracted[i].keyLevel = altRunsData[x].mythic_level;
+          tyrRunsExtracted[i].score = altRunsData[x].score;
+          tyrRunsExtracted[i].upgrades = altRunsData[x].num_keystone_upgrades;
         }
-        if (nameA > nameB) {
-            return 1;
-        }
-        // names must be equal
-        return 0;
-    });
+      }
+    }  
+	}
 }
 
-function sortTyr(){
-    tyrRunsExtracted.sort((a,b) => {
-        const nameA = a.dungeon.toUpperCase(); // ignore upper and lowercase
-        const nameB = b.dungeon.toUpperCase(); // ignore upper and lowercase
-        if (nameA < nameB) {
-            return -1;
-        }
-        if (nameA > nameB) {
-            return 1;
-        }
-        // names must be equal
-        return 0;
-    });
-}
-
-if (fortRunsExtracted.length > 1){
-    sortFort();
-    }
- 
-if (tyrRunsExtracted.length > 1){
-    sortTyr();
-    }
-
-    //check array for missing runs and insert blank ones in the correct spaces
-
-function populateFort(){
-    for(let i=0; i<dungeons.length; i++){
-        //check if current dungeon matches corresponding in extracted array, if it doesn't, put it in
-        if (fortRunsExtracted[i].dungeon != dungeons[i]){
-            let specificObject = {dungeon:dungeons[i],keyLevel:0,score:0,affixWeek:"Fortified",upgrades:0};
-            fortRunsExtracted.splice(i,0,specificObject)
-        //if it does, check if the array is full (8 objects), if not, put the next one in
-        } else if (fortRunsExtracted[i].dungeon === dungeons[i] && fortRunsExtracted.length < dungeons.length){
-            let specificObject = {dungeon:dungeons[i+1],keyLevel:0,score:0,affixWeek:"Fortified",upgrades:0};
-            fortRunsExtracted.splice(i+1,0,specificObject)
-        }
-        //won't do anything if the array is fully populated
-    }
-}
-
-function populateTyr(){
-    for(let i=0; i<dungeons.length; i++){
-        
-        if (tyrRunsExtracted[i].dungeon != dungeons[i]){
-            let specificObject = {dungeon:dungeons[i],keyLevel:0,score:0,affixWeek:"Tyrannical",upgrades:0};
-            tyrRunsExtracted.splice(i,0,specificObject)
-        } else if (tyrRunsExtracted[i].dungeon === dungeons[i] && tyrRunsExtracted.length < dungeons.length){
-            let specificObject = {dungeon:dungeons[i+1],keyLevel:0,score:0,affixWeek:"Tyrannical",upgrades:0};
-            tyrRunsExtracted.splice(i+1,0,specificObject)
-        }
-    }
-}
-
-//only calls above function if we dont have a run for each dungeon
-if (fortRunsExtracted.length != dungeons.length){
-    populateFort();
-}
-
-if (tyrRunsExtracted.length != dungeons.length){
-    populateTyr();
-}
+replaceWithData();
 
 //computes the weighted scores for m+ rating
 
