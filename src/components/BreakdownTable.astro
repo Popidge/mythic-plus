@@ -13,10 +13,8 @@ let fortRunsExtracted = [];
 let tyrRunsExtracted = [];
 
 //extract from best runs to relevant array
-
-function extractBestRuns(){
-    let bestRunsData = data.mythic_plus_best_runs;
-    
+let bestRunsData = data.mythic_plus_best_runs;
+function extractBestRuns(){ 
     //catches if there are no best runs and returns first object with "0" values (rest populated later)
 
     if (bestRunsData.length === 0) {
@@ -60,12 +58,11 @@ function extractBestRuns(){
 }}};
 
 //extract from alt runs to relevant array
-
+let altRunsData = data.mythic_plus_alternate_runs;
 function extractAltRuns(){
-    let altRunsData = data.mythic_plus_alternate_runs;
-    let bestRunsData = data.mythic_plus_best_runs;
 
     if (altRunsData.length === 0 && bestRunsData[0].affixes[0].name === "Fortified") {
+        if (tyrRunsExtracted.length === 0){
         let defaultObject={};
 
         defaultObject.dungeon = dungeons[0];
@@ -74,10 +71,10 @@ function extractAltRuns(){
         defaultObject.affixWeek = "Tyrannical";
         defaultObject.upgrades = 0;
 
-        tyrRunsExtracted.push(defaultObject);
+        tyrRunsExtracted.push(defaultObject);}
 
     } else if (altRunsData.length === 0 && bestRunsData[0].affixes[0].name === "Tyrannical") {
-  
+        if (fortRunsExtracted.length === 0){
         let defaultObject={};
 
         defaultObject.dungeon = dungeons[0];
@@ -86,7 +83,7 @@ function extractAltRuns(){
         defaultObject.affixWeek = "Fortified";
         defaultObject.upgrades = 0;
 
-        fortRunsExtracted.push(defaultObject);
+        fortRunsExtracted.push(defaultObject);}
     } else if (altRunsData.length != 0) {
 
     for(let i=0; i<altRunsData.length; i++){
@@ -107,9 +104,12 @@ function extractAltRuns(){
 }};
 
 extractBestRuns();
-if (data.mythic_plus_alternate_runs.length !=0){
+if (bestRunsData.length !=0){
 extractAltRuns();
 }
+
+console.log(tyrRunsExtracted)
+console.log(fortRunsExtracted)
 
 //sort arrays by dungeon alphabetically
 function sortFort(){
@@ -149,9 +149,6 @@ if (fortRunsExtracted.length > 1){
 if (tyrRunsExtracted.length > 1){
     sortTyr();
     }
-
-console.log(fortRunsExtracted)
-console.log(tyrRunsExtracted)
 
     //check array for missing runs and insert blank ones in the correct spaces
 
