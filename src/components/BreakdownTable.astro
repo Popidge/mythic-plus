@@ -1,6 +1,6 @@
 ---
 const {userRegion,userRealm,userName,userKey} = Astro.props;
-//TODO - catch a 200 response from the raider.io API
+//TODO - catch a 200 response from the raider.io API (https://www.tjvantoll.com/2015/09/13/fetch-and-errors/ is a good example)
 const apiCall = await fetch('https://raider.io/api/v1/characters/profile?region=' +userRegion+ '&realm=' +userRealm+ '&name=' +userName+ '&fields=mythic_plus_best_runs:all,mythic_plus_alternate_runs:all')
 const data = await apiCall.json();
 
