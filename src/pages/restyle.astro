@@ -2,12 +2,12 @@
 import BreakdownRestyle from "../components/BreakdownRestyle.astro";
 import Layout from "../layouts/Layout.astro";
 
-const {region,realm,name} = Astro.params
+//const {region,realm,name} = Astro.params
 
 ---
 
 <Layout title="M+ Calculator">
-	<BreakdownRestyle userRegion={region} userRealm={realm} userName={name}/>
+	<BreakdownRestyle userRegion="EU" userRealm="Silvermoon" userName="Titanbeard"/>
 </Layout>
 
 <style>

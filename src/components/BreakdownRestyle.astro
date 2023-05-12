@@ -1,4 +1,5 @@
 ---
+
 const {userRegion,userRealm,userName} = Astro.props;
 
 const apiCall = await fetch('https://raider.io/api/v1/characters/profile?region=' +userRegion+ '&realm=' +userRealm+ '&name=' +userName+ '&fields=mythic_plus_best_runs:all,mythic_plus_alternate_runs:all')
@@ -274,6 +275,8 @@ const totalScore = function(){
     return (fortScores+tyrScores).toFixed(0);
 }
 
+const {fortRunsData = fortRunsExtracted, tyrRunsData = tyrRunsExtracted} = Astro.props;
+
 ---
 
 <div class="grid grid-rows-1 grid-cols-5 text-center m-10 dark:text-slate-300">
@@ -394,5 +397,27 @@ const totalScore = function(){
     </tr>
     </tbody>
     </table>
+    </div>
+</div>
+
+<div class="grid grid-cols-2 lg:grid-cols-5 text-center m-10 dark:text-slate-300">
+    <div>
+        <table class="table-auto">
+            <thead>
+                <tr>
+                    <th rowspan="2">Dungeon</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>{dungeons[0]}</td></tr>
+                <tr><td>{dungeons[1]}</td></tr>
+                <tr><td>{dungeons[2]}</td></tr>
+                <tr><td>{dungeons[3]}</td></tr>
+                <tr><td>{dungeons[4]}</td></tr>
+                <tr><td>{dungeons[5]}</td></tr>
+                <tr><td>{dungeons[6]}</td></tr>
+                <tr><td>{dungeons[7]}</td></tr>
+            </tbody>
+        </table>
     </div>
 </div>
