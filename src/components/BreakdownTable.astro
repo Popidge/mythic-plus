@@ -138,12 +138,12 @@ function weightCalcScore(tyrCurrentBase,fortCurrentBase,affix,keyLevel){
 
     //calculates base score for timing a key (minimum possible timing)
     let completionScore = null;
-    const dungeonBaseScores = [0,40,45,55,60,65,75,80,85,100];
+    const dungeonBaseScores = [0,40,45,50,55,60,75,80,85,90,97,104,111,128];
 
-    if (keyLevel<=10){
+    if (keyLevel<=14){
         completionScore = dungeonBaseScores[keyLevel];
     } else {
-        completionScore = (100 + 7*(keyLevel-10)) 
+        completionScore = (100 + 7*(keyLevel-14)) 
     }  
     //checks if calculated score will be new best and returns the weighted gain
     let compScore = completionScore;
